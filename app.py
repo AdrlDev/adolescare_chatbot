@@ -17,15 +17,10 @@ app.add_middleware(
 def root():
     return {"message": "Adolescare RAG Chatbot is live."}
 
-# @app.get("/chat")
-# def chat_endpoint(query: str):
-#     answer = qa_bot.invoke(query)
-#     return {"answer": answer}
-
 @app.get("/chat")
 def chat(query: str = Query(...)):
     try:
-        result = qa_bot(query)
+        result = qa_bot.invoke(query)
         answer = result['result']
         sources = result.get('source_documents', [])
 
