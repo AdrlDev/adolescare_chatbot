@@ -13,6 +13,11 @@ INDEX_PATH = "faiss_index.index"
 METADATA_PATH = "faiss_index_metadata.pkl"
 VECTORSTORE_PATH = "vectorstore.index"
 
+import json
+from pathlib import Path
+
+TIP_CACHE_FILE = "tips.json"
+
 load_dotenv()
 api_key = os.getenv("COHERE_API_KEY")
 
@@ -59,3 +64,37 @@ def get_chatbot():
         return_source_documents=True  # return sources to verify relevance
     )
     return qa
+
+def generate_title(tip: str) -> str:
+    try:
+        chat = ChatCohere(
+            model="command-r-plus",
+            temperature=0.2,
+            cohere_api_key=api_key
+        )
+        prompt = f"Give a short, 3- to 5-word title for this adolescent health tip: \"{tip}\""
+        result = chat.invoke(prompt)
+        return result.strip().replace('"', '')
+    except Exception as e:
+        print(f"[ERROR] Failed to generate title with LLM: {e}")
+        return "Daily Health Tip"
+
+# Load tips from file at startup
+def load_tip_cache():
+    global tip_cache
+    if Path(TIP_CACHE_FILE).exists():
+        with open(TIP_CACHE_FILE, "r") as file:
+            try:
+                tip_cache = json.load(file)
+            except json.JSONDecodeError:
+                tip_cache = {}
+    else:
+        tip_cache = {}
+
+# Save updated tips to file
+def save_tip_cache():
+    with open(TIP_CACHE_FILE, "w") as file:
+        json.dump(tip_cache, file, indent=2)
+
+# Call this once at startup
+load_tip_cache()
