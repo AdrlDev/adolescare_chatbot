@@ -7,6 +7,10 @@ from langchain_community.document_loaders.pdf import PyPDFLoader
 from langchain.chains import RetrievalQA
 from dotenv import load_dotenv
 
+from pydantic import BaseModel
+from typing import List
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
 app = FastAPI()
 
 INDEX_PATH = "faiss_index.index"
@@ -17,6 +21,7 @@ import json
 from pathlib import Path
 
 TIP_CACHE_FILE = "tips.json"
+INSIGHT_CACHE_FILE = Path("insight_cache.json")
 
 load_dotenv()
 api_key = os.getenv("COHERE_API_KEY")
@@ -36,7 +41,13 @@ def load_documents():
     documents = []
     for pdf in pdf_files:
         loader = PyPDFLoader(pdf)
-        documents.extend(loader.load())
+        raw_docs = loader.load()
+        splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000,
+            chunk_overlap=200
+        )
+        chunks = splitter.split_documents(raw_docs)
+        documents.extend(chunks)
 
     return documents
 
@@ -56,7 +67,7 @@ def get_vectorstore():
 
 def get_chatbot():
     vectorstore = get_vectorstore()
-    chat = ChatCohere(model="command-r-plus", temperature=0, cohere_api_key=api_key)
+    chat = ChatCohere(model="command-r7b-12-2024", temperature=0, cohere_api_key=api_key)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
     qa = RetrievalQA.from_chain_type(
         llm=chat,
@@ -98,3 +109,7 @@ def save_tip_cache():
 
 # Call this once at startup
 load_tip_cache()
+
+class InsightsRequest(BaseModel):
+    symptoms: List[str]
+    activities: List[str]
