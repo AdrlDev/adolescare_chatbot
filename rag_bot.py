@@ -85,7 +85,13 @@ def generate_title(tip: str) -> str:
         )
         prompt = f"Give a short, 3- to 5-word title for this adolescent health tip: \"{tip}\""
         result = chat.invoke(prompt)
-        return result.strip().replace('"', '')
+
+        # Extract the actual message content if it's an AIMessage
+        if hasattr(result, "content"):
+            result = result.content
+
+        return str(result).strip().replace('"', '')
+
     except Exception as e:
         print(f"[ERROR] Failed to generate title with LLM: {e}")
         return "Daily Health Tip"
