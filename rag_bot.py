@@ -79,7 +79,7 @@ def get_chatbot():
 def generate_title(tip: str) -> str:
     try:
         chat = ChatCohere(
-            model="command-r-plus",
+            model="command-r7b-12-2024",
             temperature=0.2,
             cohere_api_key=api_key
         )
