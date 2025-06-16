@@ -67,7 +67,7 @@ def get_vectorstore():
 
 def get_chatbot():
     vectorstore = get_vectorstore()
-    chat = ChatCohere(model="command-r7b-12-2024", temperature=0, cohere_api_key=api_key)
+    chat = ChatCohere(model="command-a-03-2025", temperature=0, cohere_api_key=api_key)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
     qa = RetrievalQA.from_chain_type(
         llm=chat,
@@ -79,7 +79,7 @@ def get_chatbot():
 def generate_title(tip: str) -> str:
     try:
         chat = ChatCohere(
-            model="command-r7b-12-2024",
+            model="command-a-03-2025",
             temperature=0.2,
             cohere_api_key=api_key
         )

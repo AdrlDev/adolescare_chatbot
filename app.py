@@ -81,7 +81,6 @@ def get_todays_tip():
         tip = tip_cache[today]
     else:
         # Generate new tip using LangChain QA
-        qa_bot = get_chatbot()
         prompt = "Give me one practical, short, and helpful health or self-care tip for adolescents. Be specific and clear."
         result = qa_bot.invoke(prompt)
         tip = result["result"]
