@@ -11,6 +11,8 @@ from pydantic import BaseModel
 from typing import List
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
+import re
+
 app = FastAPI()
 
 INDEX_PATH = "faiss_index.index"
@@ -78,6 +80,11 @@ def get_chatbot():
 
 def generate_title(tip: str) -> str:
     try:
+        # Clean the tip (remove markdown like "**Tip:**" or "Tip:")
+        tip = re.sub(r'^\s*\*?\*?Tip:\*?\*?\s*', '', tip, flags=re.IGNORECASE)
+        tip = re.sub(r'\*+', '', tip).strip()
+        tip = tip[0].upper() + tip[1:] if tip else tip
+
         chat = ChatCohere(
             model="command-a-03-2025",
             temperature=0.2,
@@ -86,15 +93,33 @@ def generate_title(tip: str) -> str:
         prompt = f"Give a short, 3- to 5-word title for this adolescent health tip: \"{tip}\""
         result = chat.invoke(prompt)
 
-        # Extract the actual message content if it's an AIMessage
         if hasattr(result, "content"):
             result = result.content
 
-        return str(result).strip().replace('"', '')
+        # Remove filler phrases like "Sure! Here's a title:"
+        cleaned = re.sub(
+            r'(?i)^.*?(?:title\s*:|is\s*|here\s*(?:is|\'s)?\s*(?:a)?\s*title\s*[:\-]?)\s*',
+            '',
+            result
+        )
+
+        # Remove quotes and emoji/symbols
+        cleaned = re.sub(r'[^\w\s]', '', cleaned)               # remove punctuation/symbols
+        cleaned = re.sub(r'[\U00010000-\U0010ffff]', '', cleaned)  # remove emojis
+
+        # Capitalize each word and limit to 5 words max
+        words = cleaned.strip().split()
+        title_words = words[:5]
+        title = ' '.join(word.capitalize() for word in title_words)
+
+        return {"title": title, "tip": tip}
 
     except Exception as e:
         print(f"[ERROR] Failed to generate title with LLM: {e}")
-        return "Daily Health Tip"
+        return {
+            "title": "Daily Health Tip",
+            "tip": tip.strip()
+        }
 
 # Load tips from file at startup
 def load_tip_cache():

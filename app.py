@@ -80,8 +80,10 @@ def get_todays_tip():
     if today in tip_cache:
         tip = tip_cache[today]
     else:
-        # Generate new tip using LangChain QA
-        prompt = "Give me one practical, short, and helpful health or self-care tip for adolescents. Be specific and clear."
+        prompt = (
+            "Give me one practical, short, and helpful health or self-care tip for adolescents. "
+            "Be specific and clear. Start with the actual tip without saying 'Tip:'."
+        )
         result = qa_bot.invoke(prompt)
         tip = result["result"]
 
@@ -93,8 +95,8 @@ def get_todays_tip():
 
     return {
         "date": formatted_date,
-        "title": title,
-        "tip": tip
+        "title": title["title"],
+        "tip": title["tip"]
     }
 
 @app.post("/insights")
