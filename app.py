@@ -45,8 +45,8 @@ def root():
 def chat(query: str = Query(...)):
     try:
         result = qa_bot.invoke(query)
-        answer = result['result']
-        sources = result.get('source_documents', [])
+        answer = result.get("result", "")
+        sources = result.get("source_documents", [])
 
         if not sources:
             return {
@@ -60,7 +60,8 @@ def chat(query: str = Query(...)):
             "answer": {
                 "query": query,
                 "result": answer
-            }
+            },
+            "sources": [doc.metadata for doc in sources]  # optional: show file/line
         }
 
     except Exception as e:

@@ -41,13 +41,16 @@ def load_documents():
     ]
 
     documents = []
+    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+
     for pdf in pdf_files:
         loader = PyPDFLoader(pdf)
         raw_docs = loader.load()
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200
-        )
+
+        # ✅ Add metadata to each page/document
+        for doc in raw_docs:
+            doc.metadata["source"] = pdf
+
         chunks = splitter.split_documents(raw_docs)
         documents.extend(chunks)
 
@@ -70,7 +73,10 @@ def get_vectorstore():
 def get_chatbot():
     vectorstore = get_vectorstore()
     chat = ChatCohere(model="command-a-03-2025", temperature=0, cohere_api_key=api_key)
-    retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
+    retriever = vectorstore.as_retriever(
+        search_type="similarity_score_threshold",
+        search_kwargs={"k": 5, "score_threshold": 0.5}
+    )
     qa = RetrievalQA.from_chain_type(
         llm=chat,
         retriever=retriever,
