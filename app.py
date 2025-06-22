@@ -52,7 +52,7 @@ def chat(query: str = Query(...)):
             return {
                 "answer": {
                     "query": query,
-                    "result": "Sorry, I couldn't find information about that in the documents provided."
+                    "result": "I'm sorry, I couldn't find an exact answer, but I can try to help further if you rephrase your question."
                 }
             }
 

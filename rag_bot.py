@@ -41,7 +41,7 @@ def load_documents():
     ]
 
     documents = []
-    splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
 
     for pdf in pdf_files:
         loader = PyPDFLoader(pdf)
@@ -75,7 +75,7 @@ def get_chatbot():
     chat = ChatCohere(model="command-a-03-2025", temperature=0, cohere_api_key=api_key)
     retriever = vectorstore.as_retriever(
         search_type="similarity_score_threshold",
-        search_kwargs={"k": 5, "score_threshold": 0.5}
+        search_kwargs={"k": 5, "score_threshold": 0.3}
     )
     qa = RetrievalQA.from_chain_type(
         llm=chat,
