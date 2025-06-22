@@ -1,3 +1,4 @@
+import random
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Query
 from fastapi import FastAPI
@@ -81,9 +82,15 @@ def get_todays_tip():
     if today in tip_cache:
         tip = tip_cache[today]
     else:
+        categories = [
+            "mental health", "nutrition", "sleep", "hydration", "exercise", 
+            "social relationships", "study habits", "menstrual health", "digital wellness"
+        ]
+        selected_category = random.choice(categories)
+
         prompt = (
-            "Give me one practical, short, and helpful health or self-care tip for adolescents. "
-            "Be specific and clear. Start with the actual tip without saying 'Tip:'."
+            f"Today is {formatted_date}. Give me one practical, short, and helpful tip about {selected_category} "
+            "for adolescents. Be specific and clear. Start directly with the tip."
         )
         result = qa_bot.invoke(prompt)
         tip = result["result"]
@@ -104,26 +111,26 @@ def get_todays_tip():
 def get_insights(data: InsightsRequest):
     try:
         # Create a unique hash from the symptoms and activities
-        input_key = f"{data.symptoms}-{data.activities}"
+        input_key = f"{data.sexDrives}-{data.moods}"
         input_hash = hashlib.md5(input_key.encode()).hexdigest()
 
         # Check cache
         if input_hash in insight_cache:
             cached = insight_cache[input_hash]
             return {
-                "sexDrives": data.symptoms,
-                "moods": data.activities,
+                "sexDrives": data.sexDrives,
+                "moods": data.moods,
                 "insights": cached["insights"],
                 "cached": True
             }
 
         # Format prompt
-        symptoms_str = ", ".join(data.symptoms)
-        activities_str = ", ".join(data.activities)
+        sex_drives_str = ", ".join(data.sexDrives)
+        moods_str = ", ".join(data.moods)
 
         prompt = (
             f"You are a helpful adolescent health assistant. "
-            f"Based on the following symptoms: {symptoms_str}, and activities: {activities_str}, "
+            f"Based on the following sex drives: {sex_drives_str}, and moods: {moods_str}, "
             "generate specific, evidence-based insights that could indicate reproductive health outcomes "
             "such as early pregnancy signs, risks, or recommendations. "
             "Use only the information from official adolescent reproductive health documents such as "
@@ -137,15 +144,15 @@ def get_insights(data: InsightsRequest):
         # Cache it
         insight_cache[input_hash] = {
             "insights": insights,
-            "symptoms": data.symptoms,
-            "activities": data.activities
+            "sexDrives": data.sexDrives,
+            "moods": data.moods
         }
 
         save_insight_cache()
 
         return {
-            "symptoms": data.symptoms,
-            "activities": data.activities,
+            "sexDrives": data.sexDrives,
+            "moods": data.moods,
             "insights": insights,
             "cached": False
         }
