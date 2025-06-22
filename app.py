@@ -111,8 +111,8 @@ def get_insights(data: InsightsRequest):
         if input_hash in insight_cache:
             cached = insight_cache[input_hash]
             return {
-                "symptoms": data.symptoms,
-                "activities": data.activities,
+                "sexDrives": data.symptoms,
+                "moods": data.activities,
                 "insights": cached["insights"],
                 "cached": True
             }

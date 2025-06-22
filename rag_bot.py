@@ -148,5 +148,5 @@ def save_tip_cache():
 load_tip_cache()
 
 class InsightsRequest(BaseModel):
-    symptoms: List[str]
-    activities: List[str]
+    sexDrives: List[str]
+    moods: List[str]
