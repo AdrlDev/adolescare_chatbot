@@ -83,15 +83,24 @@ def get_todays_tip():
         tip = tip_cache[today]
     else:
         categories = [
-            "mental health", "nutrition", "sleep", "hydration", "exercise", 
-            "social relationships", "study habits", "menstrual health", "digital wellness"
+            "pregnancy prevention",
+            "early signs of pregnancy",
+            "safe sex practices",
+            "family planning for teens",
+            "myths about getting pregnant",
+            "contraceptive awareness",
+            "healthy pregnancy habits",
+            "how to talk to a partner about safe sex",
+            "understanding fertility cycles"
         ]
         selected_category = random.choice(categories)
 
         prompt = (
-            f"Today is {formatted_date}. Give me one practical, short, and helpful tip about {selected_category} "
-            "for adolescents. Be specific and clear. Start directly with the tip."
+            f"Today is {formatted_date}. Give one practical, short, and medically accurate tip for adolescents "
+            f"about {selected_category}. The tip should be helpful, clear, and specific — about 1–2 sentences. "
+            f"Start directly with the tip. No introduction, no explanation."
         )
+        
         result = qa_bot.invoke(prompt)
         tip = result["result"]
 
@@ -120,6 +129,11 @@ def get_insights(data: InsightsRequest):
             return {
                 "sexDrives": data.sexDrives,
                 "moods": data.moods,
+                "symptoms": data.symptoms,
+                "vaginalDischarge": data.vaginalDischarge,
+                "digestionAndStool": data.digestionAndStool,
+                "pregnancyTest": data.pregnancyTest,
+                "physicalActivity": data.physicalActivity,
                 "insights": cached["insights"],
                 "cached": True
             }
@@ -127,10 +141,15 @@ def get_insights(data: InsightsRequest):
         # Format prompt
         sex_drives_str = ", ".join(data.sexDrives)
         moods_str = ", ".join(data.moods)
+        symptoms_str = ", ".join(data.symptoms)
+        vaginalDischarge_str = ", ".join(data.vaginalDischarge)
+        digestionAndStool_str = ", ".join(data.digestionAndStool)
+        pregnancyTest_str = ", ".join(data.pregnancyTest)
+        physicalActivity_str = ", ".join(data.physicalActivity)
 
         prompt = (
             f"You are a helpful adolescent health assistant. "
-            f"Based on the following sex drives: {sex_drives_str}, and moods: {moods_str}, "
+            f"Based on the following sex drives: {sex_drives_str}, moods: {moods_str}, symptoms: {symptoms_str}, vaginalDischarge: {vaginalDischarge_str}, digestionAndStool: {digestionAndStool_str}, pregnancyTest: {pregnancyTest_str}, physicalActivity: {physicalActivity_str}"
             "generate specific, evidence-based insights that could indicate reproductive health outcomes "
             "such as early pregnancy signs, risks, or recommendations. "
             "Use only the information from official adolescent reproductive health documents such as "
@@ -139,13 +158,24 @@ def get_insights(data: InsightsRequest):
         )
 
         result = qa_bot.invoke(prompt)
-        insights = result["result"]
+        insights_full = result["result"]
+
+        # Summarize into detailed but structured output
+        summary = summarize_insights(insights_full)
 
         # Cache it
         insight_cache[input_hash] = {
-            "insights": insights,
+            "insights": {
+                "full": insights_full,
+                "summary": summary
+            },
             "sexDrives": data.sexDrives,
-            "moods": data.moods
+            "moods": data.moods,
+            "symptoms": data.symptoms,
+            "vaginalDischarge": data.vaginalDischarge,
+            "digestionAndStool": data.digestionAndStool,
+            "pregnancyTest": data.pregnancyTest,
+            "physicalActivity": data.physicalActivity
         }
 
         save_insight_cache()
@@ -153,7 +183,15 @@ def get_insights(data: InsightsRequest):
         return {
             "sexDrives": data.sexDrives,
             "moods": data.moods,
-            "insights": insights,
+            "symptoms": data.symptoms,
+            "vaginalDischarge": data.vaginalDischarge,
+            "digestionAndStool": data.digestionAndStool,
+            "pregnancyTest": data.pregnancyTest,
+            "physicalActivity": data.physicalActivity,
+            "insights": {
+                "full": insights_full,
+                "summary": summary
+            },
             "cached": False
         }
 
@@ -165,3 +203,24 @@ def get_insights(data: InsightsRequest):
 def save_insight_cache():
     with open(INSIGHT_CACHE_FILE, "w") as f:
         json.dump(insight_cache, f)
+
+def summarize_insights(insight_text: str) -> dict:
+    # Basic parsing approach — extract categorized data
+    summary = {
+        "possibleConditions": [],
+        "recommendations": [],
+        "warnings": [],
+        "notes": insight_text  # fallback full text
+    }
+
+    lines = insight_text.split("\n")
+    for line in lines:
+        lower = line.lower()
+        if "may indicate" in lower or "suggests" in lower or "possible" in lower:
+            summary["possibleConditions"].append(line.strip())
+        elif "should" in lower or "recommended" in lower or "advised" in lower:
+            summary["recommendations"].append(line.strip())
+        elif "warning" in lower or "caution" in lower or "risk" in lower:
+            summary["warnings"].append(line.strip())
+
+    return summary

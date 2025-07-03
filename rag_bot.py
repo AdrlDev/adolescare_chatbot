@@ -150,3 +150,8 @@ load_tip_cache()
 class InsightsRequest(BaseModel):
     sexDrives: List[str]
     moods: List[str]
+    symptoms: List[str]
+    vaginalDischarge: List[str]
+    digestionAndStool: List[str]
+    pregnancyTest: List[str]
+    physicalActivity: List[str]
