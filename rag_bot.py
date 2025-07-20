@@ -30,14 +30,14 @@ api_key = os.getenv("COHERE_API_KEY")
 
 def load_documents():
     pdf_files = [
-        "modules/pdf/dswd_guidelines_for_the_national_implementation_of_project_protect_teen/dswd_guidelines_for_the_national_implementation_of_project_protect_teen.pdf",
-        "modules/pdf/integrating_poverty_and_gender_into_health_programmes/integrating_poverty_and_gender_into_health_programmes.pdf",
-        "modules/pdf/preventing_teen_pregnancies/preventing_teen_pregnancies.pdf",
-        "modules/pdf/sexual_and_reproductive_health_and_rights_of_young_people/sexual_and_reproductive_health_and_rights_of_young_people.pdf",
-        "modules/pdf/sexual_and_reproductive_health_of_adolescents_and_youth_in_the_philippines/sexual_and_reproductive_health_of_adolescents_and_youth_in_the_philippines.pdf",
-        "modules/pdf/teen_pregnancy_prevention_and_support/teen_pregnancy_prevention_and_support.pdf",
-        "modules/pdf/teenage_pregnancy_sexually_transmitted_infections_and_hiv_aids/teenage_pregnancy_sexually_transmitted_infections_and_hiv_aids.pdf",
-        "modules/pdf/the_philippine_clinical_standards_manual_on_family_planning/the_philippine_clinical_standards_manual_on_family_planning.pdf",
+        "modules/pdf/dswd_guidelines_for_the_national_implementation_of_project_protect_teen/0_dswd_guidelines_for_the_national_implementation_of_project_protecteen_0.pdf",
+        "modules/pdf/integrating_poverty_and_gender_into_health_programmes/0_integrating_poverty_and_gender_into_health_programmes_module_on_sexual_and_reproductive_health_0.pdf",
+        "modules/pdf/preventing_teen_pregnancies/0_PREVENTING_TEEN_PREGNANCIES.pdf",
+        "modules/pdf/sexual_and_reproductive_health_and_rights_of_young_people/0_sexual_and_reproductive_health_and_rights_of_young_people.pdf",
+        "modules/pdf/sexual_and_reproductive_health_of_adolescents_and_youth_in_the_philippines/0_sexual_and_reproductive_health_of_adolescents_and_youth_in_the_philippines.pdf",
+        "modules/pdf/teen_pregnancy_prevention_and_support/0_teenage_pregnancy_sexually_transmitted_infections_and_hiv_aids.pdf",
+        "modules/pdf/teenage_pregnancy_sexually_transmitted_infections_and_hiv_aids/0_teen_pregnancy_prevention_and_support.pdf",
+        "modules/pdf/the_philippine_clinical_standards_manual_on_family_planning/0_the_philippine_clinical_standards_manual_on_family_planning.pdf",
     ]
 
     documents = []
